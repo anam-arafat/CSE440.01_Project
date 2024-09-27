@@ -1,3 +1,9 @@
+import math
+
+class AIPlayer:
+    def __init__(self, letter):
+        self.letter = letter  # 'X' or 'O'
+
 def minimax(self, state, depth, alpha, beta, is_maximizing):
         # Check for terminal state
         if state.current_winner == 'X':
