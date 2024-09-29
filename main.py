@@ -10,6 +10,10 @@ class TicTacToeGUI:
         self.root = root
         self.root.title("Tic Tac Toe")
 
-        self.buttons = [tk.Button(root, text=' ', font=('Arial', 20), width=5, height=2, command=lambda i=i: self.on_button_click(i)) for i in range(9)]
-        for i, button in enumerate(self.buttons):
+        self.buttons = []
+        for i in range(9):
+            button = tk.Button(root, text=' ', font=('Arial', 20), width=5, height=2)
+            button.config(command=lambda i=i: self.on_button_click(i))
             button.grid(row=i//3, column=i%3)
+            self.buttons.append(button)
+
