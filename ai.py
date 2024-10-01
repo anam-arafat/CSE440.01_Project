@@ -38,3 +38,15 @@ def minimax(self, state, depth, alpha, beta, is_maximizing):
             if beta <= alpha:
                 break
         return best_value
+def best_move(self, state):
+        best_move = None
+        best_value = -math.inf if self.letter == 'X' else math.inf
+        for move in state.available_moves():
+            state.make_move(move, self.letter)
+            move_value = self.minimax(state, 0, -math.inf, math.inf, self.letter == 'O')
+            state.board[move] = ' '
+            state.current_winner = None
+            if (self.letter == 'X' and move_value > best_value) or (self.letter == 'O' and move_value < best_value):
+                best_value = move_value
+                best_move = move
+        return best_move
