@@ -12,3 +12,11 @@ class TicTacToe:
         number_board = [[str(i) for i in range(j * 3, (j + 1) * 3)] for j in range(3)]
         for row in number_board:
             print('| ' + ' | '.join(row) + ' |')
+    def available_moves(self):
+        # Returns a list of available spots on the board
+        return [i for i, spot in enumerate(self.board) if spot == ' ']
+    
+    def empty_squares(self):
+        # Checks if there are empty squares
+        return ' ' in self.board
+
