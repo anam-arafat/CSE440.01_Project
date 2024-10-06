@@ -26,7 +26,7 @@ class TicTacToeGUI:
             elif self.game.empty_squares():
                 self.ai_move()
                 if self.game.current_winner:
-                    messagebox.showinfo("Game Over", "Player O wins!"
+                    messagebox.showinfo("Game Over", "Player O wins!")
                     
     def ai_move(self):
         if self.game.empty_squares():
@@ -34,6 +34,27 @@ class TicTacToeGUI:
             if move is not None:
                 self.game.make_move(move, 'O')
                 self.buttons[move].config(text='O')
+
+    def reset_game(self):
+        self.game.reset()
+        for button in self.buttons:
+            button.config(text=' ')
+        self.ai = AIPlayer('O')
+
+    def on_button_click(self, i):
+        if self.game.board[i] == ' ' and not self.game.current_winner:
+            self.game.make_move(i, 'X')
+            self.buttons[i].config(text='X')
+            if self.game.current_winner:
+                messagebox.showinfo("Game Over", "Player X wins!")
+            elif self.game.empty_squares():
+                self.ai_move()
+                if self.game.current_winner:
+                    messagebox.showinfo("Game Over", "Player O wins!")
+                elif not self.game.empty_squares():
+                    messagebox.showinfo("Game Over", "It's a tie!")
+        self.ai = AIPlayer('O')
+
 
     
 
