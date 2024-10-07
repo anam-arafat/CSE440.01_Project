@@ -54,6 +54,34 @@ class TicTacToeGUI:
                 elif not self.game.empty_squares():
                     messagebox.showinfo("Game Over", "It's a tie!")
         self.ai = AIPlayer('O')
+    
+    def handle_button_click(self, button_index):
+    if self.game.board[button_index] == ' ' and not self.game.current_winner:
+        # Player X makes a move
+        self.game.make_move(button_index, 'X')
+        self.buttons[button_index].config(text='X')
+        
+        # Check for a winner after the player's move
+        if self.game.current_winner:
+            messagebox.showinfo("Game Over", "Player X wins!")
+        
+        # If no winner, make AI move if there are empty squares
+        elif self.game.empty_squares():
+            self.ai_move()
+            
+            # Check for a winner after the AI's move
+            if self.game.current_winner:
+                messagebox.showinfo("Game Over", "Player O wins!")
+            elif not self.game.empty_squares():
+                messagebox.showinfo("Game Over", "It's a tie!")
+
+def display_game_status(self):
+    # Display game-over messages based on the game's current state
+    if self.game.current_winner:
+        messagebox.showinfo("Game Over", f"Player {self.game.current_winner} wins!")
+    elif not self.game.empty_squares():
+        messagebox.showinfo("Game Over", "It's a tie!")
+
 
 
     
