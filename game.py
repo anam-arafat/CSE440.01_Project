@@ -67,4 +67,67 @@ class TicTacToe:
         self.board = [' ' for _ in range(9)]
         self.current_winner = None
 
+class TicTacToe:
+    def __init__(self):
+        self.board = [' ' for _ in range(9)]  # 3x3 game board as a 1D list
+        self.current_winner = None  # Tracks the winner of the game
+   
+    def print_board(self):
+        # Displays the current state of the board
+        for row in [self.board[i * 3:(i + 1) * 3] for i in range(3)]:
+            print('| ' + ' | '.join(row) + ' |')
+   
+    @staticmethod
+    def print_board_nums():
+        # Prints the board numbers (0 to 8) to guide players on where to move
+        number_board = [[str(i) for i in range(j * 3, (j + 1) * 3)] for j in range(3)]
+        for row in number_board:
+            print('| ' + ' | '.join(row) + ' |')
+   
+    def available_moves(self):
+        # Returns a list of indices of available moves (empty spots)
+        return [i for i, spot in enumerate(self.board) if spot == ' ']
+   
+    def empty_squares(self):
+        # Checks if there are any empty squares left
+        return ' ' in self.board
+   
+    def num_empty_squares(self):
+        # Returns the count of empty squares
+        return self.board.count(' ')
+   
+    def make_move(self, square, letter):
+        # Marks the board with the player's letter ('X' or 'O') if the move is valid
+        if self.board[square] == ' ':
+            self.board[square] = letter
+            if self.winner(square, letter):  # Check for a win after the move
+                self.current_winner = letter
+            return True
+        return False
+   
+    def winner(self, square, letter):
+        # Checks for winning conditions (row, column, diagonals)
+        row_ind = square // 3
+        row = self.board[row_ind * 3:(row_ind + 1) * 3]
+        if all([spot == letter for spot in row]):
+            return True
+
+        col_ind = square % 3
+        column = [self.board[col_ind + i * 3] for i in range(3)]
+        if all([spot == letter for spot in column]):
+            return True
+
+        if square % 2 == 0:  # Check diagonals for even-numbered squares
+            diagonal1 = [self.board[i] for i in [0, 4, 8]]
+            if all([spot == letter for spot in diagonal1]):
+                return True
+            diagonal2 = [self.board[i] for i in [2, 4, 6]]
+            if all([spot == letter for spot in diagonal2]):
+                return True
+        return False
+
+    def reset(self):
+        # Resets the board and winner for a new game
+        self.board = [' ' for _ in range(9)]
+        self.current_winner = None
 
