@@ -75,6 +75,17 @@ class TicTacToeGUI:
         self.reset_button.pack(pady=20)
 
         self.add_hover_effect()
+        self.select_difficulty()
+    
+    def select_difficulty(self):
+        difficulty = messagebox.askquestion("Select Difficulty", "Choose difficulty: Easy, Medium, or Hard")
+        # Default to hard if invalid input is provided
+        if difficulty == "easy":
+            self.ai = AIPlayer('O', difficulty="easy")
+        elif difficulty == "medium":
+            self.ai = AIPlayer('O', difficulty="medium")
+        else:
+            self.ai = AIPlayer('O', difficulty="hard")
 
     def center_window(self, width, height):
         # Centers the window on the screen
