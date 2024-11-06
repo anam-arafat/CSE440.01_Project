@@ -86,3 +86,40 @@ class AIPlayer:
 
 
 logging.basicConfig(level=logging.DEBUG)
+
+class AIPlayer:
+    def __init__(self, letter, difficulty="hard"):
+        self.letter = letter
+        self.difficulty = difficulty
+
+    def get_opponent_letter(self):
+        """Returns the opponent's letter."""
+        return 'X' if self.letter == 'O' else 'O'
+
+    def heuristic(self, state):
+        if state.current_winner == self.letter:
+            return 1
+        elif state.current_winner is not None:
+            return -1
+        else:
+            player_score = self.count_two_in_row(state, self.letter)
+            opponent_score = self.count_two_in_row(state, self.get_opponent_letter())
+            return player_score - opponent_score
+
+    def count_two_in_row(self, state, letter):
+        count = 0
+        for i in range(3):
+            row = state.board[i * 3:(i + 1) * 3]
+            col = [state.board[i + j * 3] for j in range(3)]
+            if row.count(letter) == 2 and ' ' in row:
+                count += 1
+            if col.count(letter) == 2 and ' ' in col:
+                count += 1
+            diag1 = [state.board[i] for i in [0, 4, 8]]
+        diag2 = [state.board[i] for i in [2, 4, 6]]
+        if diag1.count(letter) == 2 and ' ' in diag1:
+            count += 1
+        if diag2.count(letter) == 2 and ' ' in diag2:
+            count += 1
+        return count
+
