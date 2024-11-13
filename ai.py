@@ -122,4 +122,76 @@ class AIPlayer:
         if diag2.count(letter) == 2 and ' ' in diag2:
             count += 1
         return count
+import math
+import random
+
+class AIPlayer:
+    def __init__(self, letter, difficulty="hard", debug=False):
+        self.letter = letter
+        self.difficulty = difficulty
+        self.debug = debug
+
+    def get_opponent_letter(self):
+        return 'X' if self.letter == 'O' else 'O'
+
+    def heuristic(self, state):
+        if state.current_winner == self.letter:
+            return 1
+        elif state.current_winner is not None:
+            return -1
+        else:
+            return self.count_two_in_row(state, self.letter) - self.count_two_in_row(state, self.get_opponent_letter())
+
+    def count_two_in_row(self, state, letter):
+        count = 0
+        for i in range(3):
+            row = state.board[i * 3:(i + 1) * 3]
+            col = [state.board[i + j * 3] for j in range(3)]
+            if row.count(letter) == 2 and ' ' in row:
+                count += 1
+            if col.count(letter) == 2 and ' ' in col:
+                count += 1
+        diag1 = [state.board[i] for i in [0, 4, 8]]
+        diag2 = [state.board[i] for i in [2, 4, 6]]
+        if diag1.count(letter) == 2 and ' ' in diag1:
+            count += 1
+        if diag2.count(letter) == 2 and ' ' in diag2:
+            count += 1
+        return count
+
+    def minimax(self, state, depth, alpha, beta, is_maximizing):
+        if self.debug:
+            print(f"{'Max' if is_maximizing else 'Min'} Depth {depth} | Alpha {alpha} | Beta {beta}")
+        if state.current_winner == 'X':
+            return 1 if self.letter == 'X' else -1
+        elif state.current_winner == 'O':
+            return 1 if self.letter == 'O' else -1
+        elif not state.empty_squares():
+            return 0
+
+        if is_maximizing:
+            max_eval = -math.inf
+            for move in state.available_moves():
+                state.make_move(move, self.letter)
+                sim_score = self.minimax(state, depth + 1, alpha, beta, False)
+                state.board[move] = ' '
+                state.current_winner = None
+                max_eval = max(max_eval, sim_score)
+                alpha = max(alpha, sim_score)
+                if beta <= alpha:
+                    break
+            return max_eval
+        else:
+            min_eval = math.inf
+            opponent = self.get_opponent_letter()
+            for move in state.available_moves():
+                state.make_move(move, opponent)
+                sim_score = self.minimax(state, depth + 1, alpha, beta, True)
+                state.board[move] = ' '
+                state.current_winner = None
+                min_eval = min(min_eval, sim_score)
+                beta = min(beta, sim_score)
+                if beta <= alpha:
+                    break
+            return min_eval
 
