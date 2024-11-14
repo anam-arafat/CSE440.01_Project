@@ -10,17 +10,22 @@ class TicTacToeGUI:
         self.select_difficulty()
 
     def select_difficulty(self):
-        # Use a dropdown to ensure valid difficulty selection
-        difficulty = simpledialog.askstring("Select Difficulty", "Choose difficulty: Easy, Medium, or Hard")
-        difficulty = difficulty.lower() if difficulty else "hard"  # Default to hard if input is None or empty
-        if difficulty == "easy":
-            self.ai = AIPlayer('O', difficulty="easy")
-        elif difficulty == "medium":
-            self.ai = AIPlayer('O', difficulty="medium")
-        else:
-            self.ai = AIPlayer('O', difficulty="hard")
-        board_frame.pack(pady=20)
-
+        while True:
+            difficulty = simpledialog.askstring("Select Difficulty", "Choose difficulty: Easy, Medium, or Hard")
+            if difficulty:
+                difficulty = difficulty.lower()
+                if difficulty in ["easy", "medium", "hard"]:
+                    self.ai = AIPlayer('O', difficulty=difficulty)
+                    messagebox.showinfo("Difficulty Set", f"Difficulty set to {difficulty.capitalize()}.")
+                    break
+                else:
+                    messagebox.showwarning("Invalid Choice", "Please choose 'Easy', 'Medium', or 'Hard'.")
+            else:
+                # Default to hard if user cancels or provides no input
+                self.ai = AIPlayer('O', difficulty="hard")
+                messagebox.showinfo("Difficulty Set", "No difficulty selected. Defaulting to Hard.")
+                break
+                
         button_size = 100  # Size of buttons on the board
         for row in range(3):
             button_row = []
