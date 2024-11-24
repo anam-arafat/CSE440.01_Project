@@ -1,48 +1,57 @@
-import logging
 import math
-import random
 
 class AIPlayer:
-    def __init__(self, letter, difficulty="hard"):
-        self.letter = letter
-        self.difficulty = difficulty
-
+    def __init__(self, letter):
+        self.letter = letter  # AI's letter ('X' or 'O')
+    
     def heuristic(self, state):
-        """Evaluates board state for the medium difficulty level."""
-        if state.current_winner == self.letter:
-            return 1
-        elif state.current_winner is not None:
-            return -1
-        else:
-            # Score based on the number of potential two-in-a-row lines
-            player_score = self.count_two_in_row(state, self.letter)
-            opponent_score = self.count_two_in_row(state, 'X' if self.letter == 'O' else 'O')
-            return player_score - opponent_score
+        """
+        Evaluates the board state and returns a score based on the AI's advantage.
+        """
+        opponent = 'O' if self.letter == 'X' else 'X'
+        score = 0
 
-    def count_two_in_row(self, state, letter):
-        """Counts two-in-a-row lines with an empty spot for the specified letter."""
-        count = 0
-        for i in range(3):
-            # Check rows and columns for two-in-a-row patterns
-            if state.board[i * 3:(i + 1) * 3].count(letter) == 2 and ' ' in state.board[i * 3:(i + 1) * 3]:
-                count += 1
-            if [state.board[i + j * 3] for j in range(3)].count(letter) == 2 and ' ' in [state.board[i + j * 3] for j in range(3)]:
-                count += 1
-        # Check diagonals
-        if [state.board[i] for i in [0, 4, 8]].count(letter) == 2 and ' ' in [state.board[i] for i in [0, 4, 8]]:
-            count += 1
-        if [state.board[i] for i in [2, 4, 6]].count(letter) == 2 and ' ' in [state.board[i] for i in [2, 4, 6]]:
-            count += 1
-        return count
-   
+        # Winning line patterns
+        winning_lines = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],  # Rows
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],  # Columns
+            [0, 4, 8], [2, 4, 6]              # Diagonals
+        ]
+
+        for line in winning_lines:
+            ai_count = sum([1 for i in line if state.board[i] == self.letter])
+            opponent_count = sum([1 for i in line if state.board[i] == opponent])
+            empty_count = sum([1 for i in line if state.board[i] == ' '])
+
+            # AI advantage
+            if ai_count == 2 and empty_count == 1:
+                score += 10  # AI is one move away from winning
+            elif ai_count == 1 and empty_count == 2:
+                score += 1  # AI has potential to set up a win
+
+            # Opponent threat
+            if opponent_count == 2 and empty_count == 1:
+                score -= 8  # Opponent is one move away from winning
+            elif opponent_count == 1 and empty_count == 2:
+                score -= 1  # Opponent has potential to set up a win
+
+            # Uncomment for balanced strategy
+            # if ai_count == 1 and opponent_count == 1 and empty_count == 1:
+            #     score += 2  # Balance both defense and offense
+
+        return score
+
     def minimax(self, state, depth, alpha, beta, is_maximizing):
         # Base case: Check for terminal state (win, lose, or tie)
-        if state.current_winner == 'X':
-            return 1 if self.letter == 'X' else -1
-        elif state.current_winner == 'O':
-            return 1 if self.letter == 'O' else -1
+        if state.current_winner == self.letter:
+            return 100 - depth  # Prioritize faster wins
+        elif state.current_winner == ('O' if self.letter == 'X' else 'X'):
+            return -100 + depth  # Penalize slower losses
         elif not state.empty_squares():
             return 0  # Tie game
+
+        if depth > 3:  # Limit depth for performance (optional)
+            return self.heuristic(state)
 
         if is_maximizing:
             max_eval = -math.inf  # Maximizing player (AI)
@@ -69,129 +78,38 @@ class AIPlayer:
                 if beta <= alpha:  # Alpha-beta pruning
                     break
             return min_eval
-   
+
     def get_move(self, game):
-        # Find the best possible move for AI
+        """
+        Returns the best move based on the selected difficulty level.
+        """
+
+        # Easy difficulty: Random move
+        # import random
+        # return random.choice(game.available_moves())
+
+        # Medium difficulty: Limited heuristic evaluation
+        # best_move = None
+        # best_score = -math.inf
+        # for move in game.available_moves():
+        #     game.make_move(move, self.letter)
+        #     score = self.heuristic(game)
+        #     game.board[move] = ' '  # Undo move
+        #     game.current_winner = None  # Reset winner
+        #     if score > best_score:
+        #         best_score = score
+        #         best_move = move
+        # return best_move
+
+        # Hard difficulty: Full Minimax with alpha-beta pruning
         best_move = None
         best_score = -math.inf
-        for possible_move in game.available_moves():
-            game.make_move(possible_move, self.letter)
+        for move in game.available_moves():
+            game.make_move(move, self.letter)
             score = self.minimax(game, 0, -math.inf, math.inf, False)
-            game.board[possible_move] = ' '  # Undo move
+            game.board[move] = ' '  # Undo move
             game.current_winner = None  # Reset winner
             if score > best_score:  # Update best move if a better score is found
                 best_score = score
-                best_move = possible_move
+                best_move = move
         return best_move
-
-
-logging.basicConfig(level=logging.DEBUG)
-
-class AIPlayer:
-    def __init__(self, letter, difficulty="hard"):
-        self.letter = letter
-        self.difficulty = difficulty
-
-    def get_opponent_letter(self):
-        """Returns the opponent's letter."""
-        return 'X' if self.letter == 'O' else 'O'
-
-    def heuristic(self, state):
-        if state.current_winner == self.letter:
-            return 1
-        elif state.current_winner is not None:
-            return -1
-        else:
-            player_score = self.count_two_in_row(state, self.letter)
-            opponent_score = self.count_two_in_row(state, self.get_opponent_letter())
-            return player_score - opponent_score
-
-    def count_two_in_row(self, state, letter):
-        count = 0
-        for i in range(3):
-            row = state.board[i * 3:(i + 1) * 3]
-            col = [state.board[i + j * 3] for j in range(3)]
-            if row.count(letter) == 2 and ' ' in row:
-                count += 1
-            if col.count(letter) == 2 and ' ' in col:
-                count += 1
-            diag1 = [state.board[i] for i in [0, 4, 8]]
-        diag2 = [state.board[i] for i in [2, 4, 6]]
-        if diag1.count(letter) == 2 and ' ' in diag1:
-            count += 1
-        if diag2.count(letter) == 2 and ' ' in diag2:
-            count += 1
-        return count
-import math
-import random
-
-class AIPlayer:
-    def __init__(self, letter, difficulty="hard", debug=False):
-        self.letter = letter
-        self.difficulty = difficulty
-        self.debug = debug
-
-    def get_opponent_letter(self):
-        return 'X' if self.letter == 'O' else 'O'
-
-    def heuristic(self, state):
-        if state.current_winner == self.letter:
-            return 1
-        elif state.current_winner is not None:
-            return -1
-        else:
-            return self.count_two_in_row(state, self.letter) - self.count_two_in_row(state, self.get_opponent_letter())
-
-    def count_two_in_row(self, state, letter):
-        count = 0
-        for i in range(3):
-            row = state.board[i * 3:(i + 1) * 3]
-            col = [state.board[i + j * 3] for j in range(3)]
-            if row.count(letter) == 2 and ' ' in row:
-                count += 1
-            if col.count(letter) == 2 and ' ' in col:
-                count += 1
-        diag1 = [state.board[i] for i in [0, 4, 8]]
-        diag2 = [state.board[i] for i in [2, 4, 6]]
-        if diag1.count(letter) == 2 and ' ' in diag1:
-            count += 1
-        if diag2.count(letter) == 2 and ' ' in diag2:
-            count += 1
-        return count
-
-    def minimax(self, state, depth, alpha, beta, is_maximizing):
-        if self.debug:
-            print(f"{'Max' if is_maximizing else 'Min'} Depth {depth} | Alpha {alpha} | Beta {beta}")
-        if state.current_winner == 'X':
-            return 1 if self.letter == 'X' else -1
-        elif state.current_winner == 'O':
-            return 1 if self.letter == 'O' else -1
-        elif not state.empty_squares():
-            return 0
-
-        if is_maximizing:
-            max_eval = -math.inf
-            for move in state.available_moves():
-                state.make_move(move, self.letter)
-                sim_score = self.minimax(state, depth + 1, alpha, beta, False)
-                state.board[move] = ' '
-                state.current_winner = None
-                max_eval = max(max_eval, sim_score)
-                alpha = max(alpha, sim_score)
-                if beta <= alpha:
-                    break
-            return max_eval
-        else:
-            min_eval = math.inf
-            opponent = self.get_opponent_letter()
-            for move in state.available_moves():
-                state.make_move(move, opponent)
-                sim_score = self.minimax(state, depth + 1, alpha, beta, True)
-                state.board[move] = ' '
-                state.current_winner = None
-                min_eval = min(min_eval, sim_score)
-                beta = min(beta, sim_score)
-                if beta <= alpha:
-                    break
-            return min_eval
-
