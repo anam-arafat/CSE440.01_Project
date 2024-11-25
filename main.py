@@ -2,30 +2,39 @@ import tkinter as tk
 from tkinter import font as tkfont
 from game import TicTacToe
 from ai import AIPlayer
-from tkinter import messagebox, simpledialog
 
 class TicTacToeGUI:
     def __init__(self, root):
-        ...
-        self.select_difficulty()
+        self.root = root
+        self.root.title("Tic-Tac-Toe with AI")
 
-    def select_difficulty(self):
-        while True:
-            difficulty = simpledialog.askstring("Select Difficulty", "Choose difficulty: Easy, Medium, or Hard")
-            if difficulty:
-                difficulty = difficulty.lower()
-                if difficulty in ["easy", "medium", "hard"]:
-                    self.ai = AIPlayer('O', difficulty=difficulty)
-                    messagebox.showinfo("Difficulty Set", f"Difficulty set to {difficulty.capitalize()}.")
-                    break
-                else:
-                    messagebox.showwarning("Invalid Choice", "Please choose 'Easy', 'Medium', or 'Hard'.")
-            else:
-                # Default to hard if user cancels or provides no input
-                self.ai = AIPlayer('O', difficulty="hard")
-                messagebox.showinfo("Difficulty Set", "No difficulty selected. Defaulting to Hard.")
-                break
-                
+        # Custom font for UI elements
+        self.custom_font = tkfont.Font(family="Avenir", size=16, weight="bold")
+
+        # Set window size and center it
+        self.window_width = 400
+        self.window_height = 500
+        self.center_window(self.window_width, self.window_height)
+
+        # Create Tic-Tac-Toe game and AI player (AI is 'O')
+        self.game = TicTacToe()
+        self.ai = AIPlayer('O')
+
+        # Initialize score tracking
+        self.user_score = 0
+        self.ai_score = 0
+        self.draw_score = 0
+
+        # Set up the UI background and layout
+        self.root.config(bg="#EAEAEA")
+        self.gradient_frame = tk.Frame(self.root, bg="#EAEAEA")
+        self.gradient_frame.pack(fill="both", expand=True)
+
+        # Create the game board (3x3 grid of buttons)
+        self.buttons = []
+        board_frame = tk.Frame(self.gradient_frame, bg="#EAEAEA")
+        board_frame.pack(pady=20)
+
         button_size = 100  # Size of buttons on the board
         for row in range(3):
             button_row = []
@@ -66,17 +75,6 @@ class TicTacToeGUI:
         self.reset_button.pack(pady=20)
 
         self.add_hover_effect()
-        self.select_difficulty()
-    
-    def select_difficulty(self):
-        difficulty = messagebox.askquestion("Select Difficulty", "Choose difficulty: Easy, Medium, or Hard")
-        # Default to hard if invalid input is provided
-        if difficulty == "easy":
-            self.ai = AIPlayer('O', difficulty="easy")
-        elif difficulty == "medium":
-            self.ai = AIPlayer('O', difficulty="medium")
-        else:
-            self.ai = AIPlayer('O', difficulty="hard")
 
     def center_window(self, width, height):
         # Centers the window on the screen
